@@ -17,8 +17,8 @@ namespace GraphTracing
 
         private int height;
         private int width;
-        ComponentLabeling componentLabeling;
-        Dictionary<int, List<Point>> connectedComponents;
+        private ComponentLabeling componentLabeling;
+        private Dictionary<int, List<Point>> connectedComponents;
 
         private Bitmap original;
         public Bitmap BinaryImage { get; set; }
@@ -44,8 +44,6 @@ namespace GraphTracing
                     componentArray[i, j] = 0;
                 }
             }
-
-
         }
 
 

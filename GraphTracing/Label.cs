@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GraphTracing
 {
-    class Label
+    internal class Label
     {
         public int ID { get; set; }
 
