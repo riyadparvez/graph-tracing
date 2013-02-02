@@ -2,6 +2,8 @@
 /GraphTracing/obj/x86/Debug/GraphTracing.csproj.FileListAbsolute.txt
 /GraphTracing/obj/x86/Debug/*.exe
 /GraphTracing/obj/x86/Debug/*.cache
+/GraphTracing/obj/*
+/GraphTracing/bin/*
 /GraphTracing/bin/Debug/*.exe
 /GraphTracing/bin/Debug/*.manifest
 /GraphTracing/bin/Debug/*.pdb
