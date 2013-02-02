@@ -206,15 +206,16 @@ namespace GraphTracing
         private void Print() 
         {
 
-            Console.WriteLine(ComponentCount);
+            Console.WriteLine("Component Count: {0}", ComponentCount);
             Console.WriteLine("----------------------------------------------\n");
+            Console.WriteLine("Components");
             Console.WriteLine("----------------------------------------------\n");
-            
-            foreach(List<Point> l in d.Values.ToList())
+
+            foreach (List<Point> lines in connectedComponents.Values.ToList())
             {
                 //List<Point> tempList = SlimLine(l);
 
-                foreach(Point p in tempList)
+                foreach (Point p in lines)
                 {
                     //double key = (p.X / (double)width) * 100;
                     //double value = 100 - (p.Y / (double)height) * 100;
@@ -230,17 +231,13 @@ namespace GraphTracing
         }
 
 
-
-
-
-
         public void Trace()
         {
             MakeGrayscale();
             MakeBinary();
             ComponentLabeling c = new ComponentLabeling(binaryArray, width, height);
-            Dictionary<int, List<Point>> d = c.Find();
-            ComponentCount = d.Count;
+            connectedComponents = c.Find();
+            ComponentCount = connectedComponents.Count;
 
             Print();
         }

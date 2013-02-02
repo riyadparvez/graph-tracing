@@ -12,12 +12,9 @@ namespace GraphTracing
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] argv)
         {
-            Console.Write("Enter whole path of image:");
-            string path = Console.ReadLine();
-            new Tracer(Image.FromFile(path) as Bitmap).Trace();
-   
+            new Tracer(Image.FromFile(argv[0]) as Bitmap).Trace();
         }
     }
 }
