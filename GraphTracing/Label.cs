@@ -6,13 +6,19 @@ namespace GraphTracing
 {
     internal class Label
     {
-        public int ID { get; set; }
+        private int id;
+
+        public int ID 
+        {
+            get { return id; }
+            internal set { id = value; }
+        }
 
         public Label Root { get; set; }
 
         public Label(int id)
         {
-            this.ID = id;
+            this.id = id;
             this.Root = this;
         }
 
@@ -28,12 +34,12 @@ namespace GraphTracing
 
         public override bool Equals(object obj)
         {
-            if (obj == null || obj.GetType() != this.GetType())
+            Label otherLabel = obj as Label;
+            if (otherLabel == null)
             {
                 return false;
             }
-            Label other = (Label)obj;
-            return this.ID == other.ID;
+            return this.ID == otherLabel.ID;
         }
 
         public override int GetHashCode()

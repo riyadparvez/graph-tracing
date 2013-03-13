@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Diagnostics.Contracts;
 
 namespace GraphTracing
 {
@@ -13,6 +15,8 @@ namespace GraphTracing
 
         public ComponentLabeling(int [,] input, int width, int height)
         {
+            Contract.Requires<ArgumentNullException>(input != null);
+
             binaryArray = input;
             this.width = width;
             this.height = height;

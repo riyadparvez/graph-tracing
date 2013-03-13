@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Diagnostics.Contracts;
 
 namespace GraphTracing
 {
@@ -27,8 +28,9 @@ namespace GraphTracing
 
         public Tracer(Bitmap original) 
         {
+            Contract.Requires<ArgumentNullException>(original != null);
+            
             this.original = original;
-
             height = original.Height;
             width = original.Width;
 
@@ -74,8 +76,9 @@ namespace GraphTracing
 
         public Bitmap MakeBinaryImage(int [,] arr)
         {
-            Bitmap newBitmap = new Bitmap(width, height);
+            Contract.Requires<ArgumentNullException>(arr != null);
 
+            Bitmap newBitmap = new Bitmap(width, height);
             Color newColor;
 
             for(int i=0; i<width; i++)
@@ -119,6 +122,10 @@ namespace GraphTracing
 
         private double Filter(int indexX, int indexY, int number)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(indexX >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(indexY >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(number >= 0);
+
             int lowerX = indexX - number;
             int lowerY = indexY - number;
             int higherX = indexX + number;
@@ -182,8 +189,44 @@ namespace GraphTracing
         }
 
 
-        private List<Point> SlimLine(List<Point> line) 
-        { 
+        private List<Point> SlimLine(IEnumerable<Point> line) 
+        {
+            Contract.Requires<ArgumentNullException>(line != null);
+            Contract.Ensures(Contract.Result<List<Point>>() != null);
+
+            var q = line.ToLookup(p => p.X);
+            List<Point> points = new List<Point>();
+            foreach(var ps in q)
+            {
+                int prevX = 0;
+                int prevY = 0;
+                double sum = 0;
+                int count = 0;
+                var ordered = ps.OrderBy(p => p.X).ThenBy(p => p.Y);
+                foreach (var o in ordered)
+                {
+                    if(o.X != prevX)
+                    {
+                        points.Add(new Point(o.X, (int)Math.Round(sum / count)));
+                        sum = o.Y;
+                        count = 1;      
+                    }
+                    else if (Math.Abs(o.Y - prevY) == 1)
+                    {
+                        sum += o.Y;
+                        count++;
+                    }
+                    else
+                    {
+                        points.Add(new Point(o.X, (int)Math.Round(sum / count)));
+                        sum = o.Y;
+                        count = 1;
+                    }
+                    prevX = o.X;
+                    prevY = o.Y;
+                }
+            }
+
             var query = from p in line
                         group p by p.X into d
                         select new
@@ -192,30 +235,30 @@ namespace GraphTracing
                             Y = d.Average(p=>p.Y)
                         };
 
-            List<Point> l = new List<Point>();
+/*            List<Point> points = new List<Point>();
 
             foreach(var element in query)
             {
-                l.Add(new Point(element.X, (int)element.Y));
+                points.Add(new Point(element.X, (int)element.Y));
             }
-
-            return l;
+            */
+            return points;
         }
 
 
         private void Print() 
         {
 
-            Console.WriteLine("Component Count: {0}", ComponentCount);
+            Console.WriteLine("Feature Count: {0}", ComponentCount);
             Console.WriteLine("----------------------------------------------\n");
-            Console.WriteLine("Components");
+            Console.WriteLine("Features");
             Console.WriteLine("----------------------------------------------\n");
 
-            foreach (List<Point> lines in connectedComponents.Values.ToList())
+            foreach (var feature in connectedComponents.Values)
             {
-                //List<Point> tempList = SlimLine(l);
+                List<Point> tempList = SlimLine(feature);
 
-                foreach (Point p in lines)
+                foreach (Point p in tempList)
                 {
                     //double key = (p.X / (double)width) * 100;
                     //double value = 100 - (p.Y / (double)height) * 100;
@@ -235,8 +278,8 @@ namespace GraphTracing
         {
             MakeGrayscale();
             MakeBinary();
-            ComponentLabeling c = new ComponentLabeling(binaryArray, width, height);
-            connectedComponents = c.Find();
+            ComponentLabeling componentLabeling = new ComponentLabeling(binaryArray, width, height);
+            connectedComponents = componentLabeling.Find();
             ComponentCount = connectedComponents.Count;
 
             Print();
